@@ -4,24 +4,27 @@ import { useLocation, Link } from 'react-router-dom';
 
 const BLUE_COLOR = '#0043FF';
 
-const StyledAppBar = styled(AppBar)({
-  background: 'transparent',
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  background: '#0000006e',
   boxShadow: 'none',
-  position: 'absolute',
+  position: 'fixed',
   zIndex: 3,
-});
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(1),
+  },
+}));
 
 const NavLink = styled(Link)({
   textDecoration: 'none'
 });
 
-const NavButton = styled(Button)(({ active }: { active?: boolean }) => ({
+const NavButton = styled(Button)(({ theme, active }: { theme: any; active?: boolean }) => ({
   color: '#FFFFFF',
   fontSize: '1rem',
   textTransform: 'none',
   fontFamily: "'Outfit', sans-serif",
   fontWeight: 500,
-  padding: '8px 16px',
+  padding: '4px 20px',
   position: 'relative',
   '&::after': {
     content: '""',
@@ -38,12 +41,20 @@ const NavButton = styled(Button)(({ active }: { active?: boolean }) => ({
     width: '100%',
     backgroundColor: BLUE_COLOR,
   },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.875rem',
+    padding: '6px 12px',
+  },
 }));
 
-const Logo = styled('img')({
+const Logo = styled('img')(({ theme }) => ({
   height: '40px',
   marginRight: '16px',
-});
+  [theme.breakpoints.down('sm')]: {
+    height: '30px',
+    marginRight: '8px',
+  },
+}));
 
 export default function Navbar() {
   const location = useLocation();
