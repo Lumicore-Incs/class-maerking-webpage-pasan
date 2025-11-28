@@ -14,11 +14,9 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   },
 }));
 
-const NavLink = styled(Link)({
-  textDecoration: 'none'
-});
-
-const NavButton = styled(Button)(({ theme, active }: { theme: any; active?: boolean }) => ({
+const NavButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>(({ theme, active }) => ({
   color: '#FFFFFF',
   fontSize: '1rem',
   textTransform: 'none',
@@ -63,8 +61,9 @@ export default function Navbar() {
   const navItems = [
     { label: 'Home', path: '/' },
     { label: 'Results', path: '/results' },
+    { label: 'Blog', path: '/blog' },
     { label: 'About', path: '/about' },
-    { label: 'Contact', path: '/contact' },
+    { label: 'Contact', path: '/#contact' },
   ];
 
   return (
@@ -78,7 +77,7 @@ export default function Navbar() {
             py: 2,
           }}
         >
-          <Logo src="/public/vite.svg" alt="EduCorner Logo" />
+          <Logo src="/public/logo.png" alt="EduCorner Logo" />
           <Box sx={{ display: 'flex', gap: 2 }}>
             {navItems.map((item) => (
               <Link
