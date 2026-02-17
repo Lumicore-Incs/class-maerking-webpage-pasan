@@ -1,6 +1,9 @@
-import { AppBar, Box, Container, Button } from '@mui/material';
+import { AppBar, Box, Container, Button, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, useMediaQuery, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useLocation, Link } from 'react-router-dom';
+import { useState } from 'react';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 
 const BLUE_COLOR = '#0043FF';
 
@@ -8,7 +11,7 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background: '#0000006e',
   boxShadow: 'none',
   position: 'fixed',
-  zIndex: 3,
+  zIndex: 1000,
   [theme.breakpoints.down('sm')]: {
     padding: theme.spacing(1),
   },
@@ -54,7 +57,53 @@ const Logo = styled('img')(({ theme }) => ({
   },
 }));
 
+const MobileMenuButton = styled(IconButton)(({ theme }) => ({
+  color: '#FFFFFF',
+  display: 'none',
+  [theme.breakpoints.down('md')]: {
+    display: 'flex',
+  },
+}));
+
+const DesktopNav = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  gap: 2,
+  [theme.breakpoints.down('md')]: {
+    display: 'none',
+  },
+}));
+
+const StyledDrawer = styled(Drawer)(({ theme }) => ({
+  '& .MuiDrawer-paper': {
+    width: '280px',
+    backgroundColor: '#1a1a1a',
+    color: '#FFFFFF',
+    padding: theme.spacing(2),
+  },
+}));
+
+const MobileNavButton = styled(ListItemButton, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>(({ theme, active }) => ({
+  color: '#FFFFFF',
+  borderRadius: '8px',
+  marginBottom: theme.spacing(1),
+  backgroundColor: active ? 'rgba(0, 67, 255, 0.1)' : 'transparent',
+  borderLeft: active ? `3px solid ${BLUE_COLOR}` : '3px solid transparent',
+  '&:hover': {
+    backgroundColor: 'rgba(0, 67, 255, 0.2)',
+  },
+  '& .MuiListItemText-primary': {
+    fontFamily: "'Outfit', sans-serif",
+    fontWeight: active ? 600 : 500,
+    color: active ? BLUE_COLOR : '#FFFFFF',
+  },
+}));
+
 export default function Navbar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -66,33 +115,100 @@ export default function Navbar() {
     { label: 'Contact', path: '/#contact' },
   ];
 
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setMobileOpen(false);
+    }
+  };
+
+  const drawer = (
+    <Box>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
+        <Logo src="/public/logo.png" alt="EduCorner Logo" />
+        <IconButton onClick={handleDrawerToggle} sx={{ color: '#FFFFFF' }}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
+      <List>
+        {navItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            style={{ textDecoration: 'none' }}
+            onClick={handleNavClick}
+          >
+            <MobileNavButton active={currentPath === item.path}>
+              <ListItemText primary={item.label} />
+            </MobileNavButton>
+          </Link>
+        ))}
+      </List>
+    </Box>
+  );
+
   return (
-    <StyledAppBar>
-      <Container maxWidth="lg">
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            py: 2,
-          }}
-        >
-          <Logo src="/public/logo.png" alt="EduCorner Logo" />
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                style={{ textDecoration: 'none' }}
-              >
-                <NavButton active={currentPath === item.path}>
-                  {item.label}
-                </NavButton>
-              </Link>
-            ))}
+    <>
+      <StyledAppBar>
+        <Container maxWidth="lg">
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              py: 2,
+            }}
+          >
+            <Logo src="/public/logo.png" alt="EduCorner Logo" />
+            
+            {/* Desktop Navigation */}
+            <DesktopNav sx={{ display: 'flex', gap: 2 }}>
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  style={{ textDecoration: 'none' }}
+                >
+                  <NavButton active={currentPath === item.path}>
+                    {item.label}
+                  </NavButton>
+                </Link>
+              ))}
+            </DesktopNav>
+
+            {/* Mobile Menu Button */}
+            <MobileMenuButton
+              edge="end"
+              onClick={handleDrawerToggle}
+              aria-label="menu"
+            >
+              <MenuIcon sx={{ fontSize: '1.8rem' }} />
+            </MobileMenuButton>
           </Box>
-        </Box>
-      </Container>
-    </StyledAppBar>
+        </Container>
+      </StyledAppBar>
+
+      {/* Mobile Drawer */}
+      <StyledDrawer
+        anchor="right"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile
+        }}
+      >
+        {drawer}
+      </StyledDrawer>
+    </>
   );
 }
