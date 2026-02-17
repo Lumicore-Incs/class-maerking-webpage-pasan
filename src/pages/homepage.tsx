@@ -1,7 +1,7 @@
 import { Box, Button, Container, Typography, IconButton } from '@mui/material';
 import { styled, keyframes } from '@mui/material/styles';
 import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
@@ -26,7 +26,8 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import LockIcon from '@mui/icons-material/Lock';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import BoltIcon from '@mui/icons-material/Bolt';
-import homeImage from '../assets/homePageImage.png';
+import homeImage from '../assets/profile01.png';
+import homeBackGroundImage01 from '../assets/homeBackGroundImage01.gif';
 import socialPageBackGround from '../assets/socialPageBackGround4.gif';
 import ContactPage from './ContactPage';
 
@@ -49,17 +50,21 @@ const pulse = keyframes`
 
 const HeroSection = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'bgcolor'
-})<HeroSectionProps>(({ bgcolor }) => ({
+})<HeroSectionProps>(({ bgcolor, theme }) => ({
   minHeight: '100vh',
   display: 'flex',
   alignItems: 'center',
-  backgroundColor: bgcolor,
-  backgroundImage: `url(${homeImage})`,
+  position: 'relative',
+  overflow: 'hidden',
+  backgroundImage: `url(${homeBackGroundImage01})`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   backgroundRepeat: 'no-repeat',
-  position: 'relative',
-  overflow: 'hidden',
+  [theme.breakpoints.down('md')]: {
+    '&::before': {
+      backdropFilter: 'blur(8px)',
+    },
+  },
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -67,7 +72,28 @@ const HeroSection = styled(Box, {
     left: 0,
     right: 0,
     bottom: 0,
+    backgroundColor: bgcolor === '#0043FF' ? 'rgba(0, 67, 255, 0.7)' : 'rgba(255, 255, 255, 0.7)',
     zIndex: 1,
+  },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    right: '-10%',
+    bottom: 0,
+    width: '55%',
+    backgroundImage: `url(${homeImage})`,
+    backgroundSize: 'contain',
+    backgroundPosition: 'center left',
+    backgroundRepeat: 'no-repeat',
+    zIndex: 2,
+    [theme.breakpoints.down('md')]: {
+      width: '100%',
+      right: 0,
+      opacity: 0.3,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    },
   },
 }));
 
@@ -86,23 +112,34 @@ const ContentWrapper = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   position: 'relative',
   zIndex: 3,
-  paddingLeft: theme.spacing(4),
+  width: '100%',
+  minHeight: '100vh',
+  [theme.breakpoints.up('md')]: {
+    paddingLeft: theme.spacing(6),
+  },
   [theme.breakpoints.down('md')]: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
+    paddingTop: theme.spacing(8),
+    paddingBottom: theme.spacing(8),
+    justifyContent: 'center',
+    alignItems: 'flex-end',
   }
 }));
 
 const TextContent = styled(Box)(({ theme }) => ({
-  flex: '0 1 600px',
+  maxWidth: '600px',
   color: 'white',
   fontFamily: "'Outfit', sans-serif",
   [theme.breakpoints.up('md')]: {
+    width: '45%',
     paddingRight: theme.spacing(4),
+    marginRight: 'auto',
   },
   [theme.breakpoints.down('md')]: {
-    flex: '1 1 100%',
+    width: '100%',
     textAlign: 'center',
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
+    paddingBottom: theme.spacing(10),
   }
 }));
 
@@ -718,6 +755,7 @@ export default function Homepage() {
   const isBlueBackground = bgColor === BLUE_COLOR;
   const textColor = WHITE_COLOR;
   const location = useLocation();
+  const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const toggleBackground = () => {
@@ -995,13 +1033,15 @@ export default function Homepage() {
       icon: <AssessmentIcon />,
       title: "Check Your Results",
       description: "View your exam scores, grades, and performance analytics instantly.",
-      buttonLabel: "View Results"
+      buttonLabel: "View Results",
+      path: "/results"
     },
     {
       icon: <NotificationsActiveIcon />,
       title: "Latest Updates",
       description: "Stay informed about announcements, schedules, and important notices.",
-      buttonLabel: "Read Updates"
+      buttonLabel: "Read Updates",
+      path: "/blog"
     }
   ];
 
@@ -1058,7 +1098,13 @@ export default function Homepage() {
           <HistoryEduIcon />
         </FloatingIcon>
 
-        <Box sx={{ position: 'fixed', top: 14, right: 10, zIndex: 5 }}>
+        <Box sx={{ 
+          position: 'fixed', 
+          top: 14, 
+          right: 10, 
+          zIndex: 5,
+          display: { xs: 'none', md: 'block' }
+        }}>
           <IconButton onClick={toggleBackground} sx={{ color: textColor }}>
             {isBlueBackground ? <Brightness7Icon /> : <Brightness4Icon />}
           </IconButton>
@@ -1105,6 +1151,10 @@ export default function Homepage() {
                 <Button
                   variant="contained"
                   size="large"
+                  onClick={() => {
+                    navigate('/results');
+                    window.scrollTo(0, 0);
+                  }}
                   sx={{
                     bgcolor: isBlueBackground ? WHITE_COLOR : BLUE_COLOR,
                     color: isBlueBackground ? BLUE_COLOR : WHITE_COLOR,
@@ -1127,6 +1177,10 @@ export default function Homepage() {
                 <Button
                   variant="outlined"
                   size="large"
+                  onClick={() => {
+                    navigate('/about');
+                    window.scrollTo(0, 0);
+                  }}
                   sx={{
                     borderColor: WHITE_COLOR,
                     color: WHITE_COLOR,
@@ -1336,6 +1390,10 @@ export default function Homepage() {
                   </Typography>
                   <PortalButton
                     variant={index === 0 ? 'contained' : 'outlined'}
+                    onClick={() => {
+                      navigate(card.path);
+                      window.scrollTo(0, 0);
+                    }}
                     sx={{
                       backgroundColor: index === 0 ? '#2563eb' : 'transparent',
                       color: 'white',
