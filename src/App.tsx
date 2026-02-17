@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Homepage from './pages/homepage';
 import Navbar from './components/Navbar';
@@ -8,12 +9,23 @@ import LoginPage from './pages/login';
 import Dashboard from './pages/Dashboard';
 import './App.css';
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [pathname]);
+
+  return null;
+}
+
 function AppContent() {
   const location = useLocation();
   const isDashboard = location.pathname.startsWith('/dashboard');
 
   return (
     <>
+      <ScrollToTop />
       {!isDashboard && <Navbar />}
       <Routes>
         <Route path="/" element={<Homepage />} />
